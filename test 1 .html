@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Umbrella Pro Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4a4af4;
+            --secondary: #8e2de2;
+            --accent: #00b09b;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --danger: #f44336;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--accent);
+        }
+        
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .logo-text p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .card-title i {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+        
+        .card-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .status-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+        
+        .status-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #96c93d);
+            border-radius: 5px;
+            width: 65%;
+            transition: width 1s ease;
+        }
+        
+        .device-list {
+            margin-top: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .device-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .device-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .device-item.active {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+        
+        .device-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .device-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .device-details h3 {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        
+        .device-details p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .device-distance {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+        
+        button.primary {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        button.primary:hover {
+            background: linear-gradient(90deg, #3A00B0, #7E1DC2);
+        }
+        
+        .weather-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin: 15px 0;
+            color: var(--accent);
+        }
+        
+        .location-map {
+            height: 200px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            opacity: 0.8;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100"><rect width="100%" height="100%" fill="%231a1a2e"/><path d="M50 15 C35 15, 20 30, 20 50 C20 70, 50 85, 50 85 C50 85, 80 70, 80 50 C80 30, 65 15, 50 15 Z" fill="none" stroke="%234a4af4" stroke-width="2"/><circle cx="50" cy="50" r="10" fill="%234a4af4" opacity="0.7"/></svg>');
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification i {
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-info h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-info p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-umbrella"></i>
+                <div class="logo-text">
+                    <h1>SmartUmbrella </h1>
+                    <p>Intelligent Weather Protection System</p>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">JS</div>
+                <div>
+                    <div>John Smith</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">Premium User</div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-bluetooth-b"></i>
+                        <span>Device Connection</span>
+                    </div>
+                    <div class="card-badge">3 Available</div>
+                </div>
+                
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-label">Connection</div>
+                        <div class="status-value" id="connectionStatus">Active</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Signal Strength</div>
+                        <div class="status-value" id="signalStrength">-42 dBm</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Device Distance</span>
+                        <span id="estimatedDistance">15 ft</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="distanceBar"></div>
+                    </div>
+                </div>
+                
+                <div class="device-list" id="deviceList">
+                    <!-- Devices will be populated here -->
+                </div>
+                
+                <div class="controls">
+                    <button class="primary" id="scanBtn">
+                        <i class="fas fa-search"></i> Scan
+                    </button>
+                    <button id="connectBtn">
+                        <i class="fas fa-link"></i> Connect
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-cloud-sun-rain"></i>
+                        <span>Weather Forecast</span>
+                    </div>
+                    <div class="card-badge" id="weatherAlert">No Alerts</div>
+                </div>
+                
+                <div class="weather-icon">
+                    <i class="fas fa-sun" id="weatherIcon"></i>
+                </div>
+                
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-label">Temperature</div>
+                        <div class="status-value" id="temperature">72°F</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Humidity</div>
+                        <div class="status-value" id="humidity">45%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Precipitation</div>
+                        <div class="status-value" id="precipitation">10%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Wind Speed</div>
+                        <div class="status-value" id="windSpeed">5 mph</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="primary" id="refreshWeather">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Location & Tracking</span>
+                    </div>
+                    <div class="card-badge" id="locationStatus">Active</div>
+                </div>
+                
+                <div class="status-item" style="margin-bottom: 15px;">
+                    <div class="status-label">Current Location</div>
+                    <div class="status-value" id="currentLocation">New York, US</div>
+                </div>
+                
+                <div class="location-map">
+                    <i class="fas fa-map-marked-alt"></i> Live Tracking Active
+                </div>
+                
+                <div class="controls">
+                    <button class="primary" id="locateBtn">
+                        <i class="fas fa-crosshairs"></i> Locate Me
+                    </button>
+                    <button id="shareLocation">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-battery-three-quarters"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="batteryLevel">78%</h3>
+                    <p>Battery Level</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-umbrella-beach"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="usageStats">24</h3>
+                    <p>Times Used This Month</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-cloud-rain"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="rainAlerts">3</h3>
+                    <p>Rain Alerts This Week</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-info-circle"></i>
+        <span>Smart Umbrella Pro is ready for use</span>
+    </div>
+
+    <script>
+        // DOM Elements
+        const connectionStatus = document.getElementById('connectionStatus');
+        const signalStrength = document.getElementById('signalStrength');
+        const distanceBar = document.getElementById('distanceBar');
+        const estimatedDistance = document.getElementById('estimatedDistance');
+        const scanBtn = document.getElementById('scanBtn');
+        const connectBtn = document.getElementById('connectBtn');
+        const deviceList = document.getElementById('deviceList');
+        const weatherAlert = document.getElementById('weatherAlert');
+        const weatherIcon = document.getElementById('weatherIcon');
+        const temperature = document.getElementById('temperature');
+        const humidity = document.getElementById('humidity');
+        const precipitation = document.getElementById('precipitation');
+        const windSpeed = document.getElementById('windSpeed');
+        const refreshWeather = document.getElementById('refreshWeather');
+        const currentLocation = document.getElementById('currentLocation');
+        const locationStatus = document.getElementById('locationStatus');
+        const locateBtn = document.getElementById('locateBtn');
+        const shareLocation = document.getElementById('shareLocation');
+        const batteryLevel = document.getElementById('batteryLevel');
+        const usageStats = document.getElementById('usageStats');
+        const rainAlerts = document.getElementById('rainAlerts');
+        const notification = document.getElementById('notification');
+        
+        // Sample devices data
+        const devices = [
+            { id: 1, name: "Smart Umbrella Pro", signal: -42, distance: "15 ft", connected: true, battery: 78 },
+            { id: 2, name: "Smart Umbrella Lite", signal: -58, distance: "28 ft", connected: false, battery: 45 },
+            { id: 3, name: "RainGuard 3000", signal: -65, distance: "42 ft", connected: false, battery: 92 }
+        ];
+        
+        // Initialize the app
+        function initApp() {
+            updateDeviceList();
+            updateLocation();
+            showNotification("Smart Umbrella Pro Dashboard initialized successfully");
+            
+            // Start simulated data updates
+            setInterval(updateSimulatedData, 5000);
+        }
+        
+        // Update device list in the UI
+        function updateDeviceList() {
+            deviceList.innerHTML = '';
+            let connectedDevice = null;
+            
+            devices.forEach(device => {
+                const deviceElement = document.createElement('div');
+                deviceElement.className = `device-item ${device.connected ? 'active' : ''}`;
+                deviceElement.innerHTML = `
+                    <div class="device-info">
+                        <div class="device-icon">
+                            <i class="fas fa-umbrella"></i>
+                        </div>
+                        <div class="device-details">
+                            <h3>${device.name}</h3>
+                            <p>Signal: ${device.signal} dBm | Battery: ${device.battery}%</p>
+                        </div>
+                    </div>
+                    <div class="device-distance">${device.distance}</div>
+                `;
+                
+                deviceElement.addEventListener('click', () => {
+                    selectDevice(device.id);
+                });
+                
+                deviceList.appendChild(deviceElement);
+                
+                if (device.connected) {
+                    connectedDevice = device;
+                }
+            });
+            
+            if (connectedDevice) {
+                updateConnectionInfo(connectedDevice);
+            }
+        }
+        
+        // Update connection information
+        function updateConnectionInfo(device) {
+            signalStrength.textContent = `${device.signal} dBm`;
+            estimatedDistance.textContent = device.distance;
+            batteryLevel.textContent = `${device.battery}%`;
+            
+            // Update distance bar based on signal strength
+            let percentage = 100 - Math.abs(device.signal + 30);
+            if (percentage < 5) percentage = 5;
+            if (percentage > 95) percentage = 95;
+            distanceBar.style.width = `${percentage}%`;
+            
+            // Update battery color
+            if (device.battery < 20) {
+                batteryLevel.style.color = "var(--danger)";
+            } else if (device.battery < 50) {
+                batteryLevel.style.color = "var(--warning)";
+            } else {
+                batteryLevel.style.color = "var(--success)";
+            }
+        }
+        
+        // Select a device
+        function selectDevice(deviceId) {
+            devices.forEach(device => {
+                device.connected = device.id === deviceId;
+                if (device.connected) {
+                    updateConnectionInfo(device);
+                    showNotification(`Connected to ${device.name}`);
+                }
+            });
+            
+            updateDeviceList();
+        }
+        
+        // Update location information
+        function updateLocation() {
+            const locations = [
+                "New York, US", 
+                "London, UK", 
+                "Tokyo, Japan", 
+                "Sydney, Australia",
+                "Paris, France"
+            ];
+            
+            const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+            currentLocation.textContent = randomLocation;
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            const notificationText = notification.querySelector('span');
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+        
+        // Update weather data
+        function updateWeather() {
+            const conditions = [
+                { icon: "fa-sun", condition: "Sunny", temp: "72°F", humidity: "45%", precip: "10%", wind: "5 mph", alert: "No Alerts" },
+                { icon: "fa-cloud", condition: "Cloudy", temp: "68°F", humidity: "60%", precip: "20%", wind: "8 mph", alert: "No Alerts" },
+                { icon: "fa-cloud-rain", condition: "Rainy", temp: "62°F", humidity: "85%", precip: "90%", wind: "12 mph", alert: "Rain Alert" },
+                { icon: "fa-bolt", condition: "Stormy", temp: "70°F", humidity: "75%", precip: "80%", wind: "18 mph", alert: "Storm Warning" }
+            ];
+            
+            const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
+            
+            weatherIcon.className = `fas ${randomCondition.icon}`;
+            temperature.textContent = randomCondition.temp;
+            humidity.textContent = randomCondition.humidity;
+            precipitation.textContent = randomCondition.precip;
+            windSpeed.textContent = randomCondition.wind;
+            weatherAlert.textContent = randomCondition.alert;
+            
+            // Update alert badge color
+            if (randomCondition.alert === "Rain Alert") {
+                weatherAlert.style.background = "var(--warning)";
+                showNotification("Rain expected within the hour - consider taking your umbrella");
+            } else if (randomCondition.alert === "Storm Warning") {
+                weatherAlert.style.background = "var(--danger)";
+                showNotification("Storm warning! Strongly recommend taking your Smart Umbrella");
+            } else {
+                weatherAlert.style.background = "rgba(255, 255, 255, 0.2)";
+            }
+        }
+        
+        // Simulate data updates
+        function updateSimulatedData() {
+            // Randomly update device signal strength and distance
+            devices.forEach(device => {
+                if (device.connected) {
+                    const signalChange = Math.floor(Math.random() * 10) - 5;
+                    device.signal = Math.max(-90, Math.min(-30, device.signal + signalChange));
+                    
+                    // Calculate distance based on signal strength (simplified)
+                    const distance = Math.round((100 + device.signal) * 0.5);
+                    device.distance = `${Math.max(5, distance)} ft`;
+                    
+                    // Slowly decrease battery
+                    if (Math.random() > 0.7) {
+                        device.battery = Math.max(5, device.battery - 1);
+                    }
+                }
+            });
+            
+            // Update connected device info
+            const connectedDevice = devices.find(device => device.connected);
+            if (connectedDevice) {
+                updateConnectionInfo(connectedDevice);
+            }
+            
+            updateDeviceList();
+            
+            // Occasionally update weather
+            if (Math.random() > 0.7) {
+                updateWeather();
+            }
+            
+            // Update usage stats occasionally
+            if (Math.random() > 0.8) {
+                const currentUsage = parseInt(usageStats.textContent);
+                usageStats.textContent = currentUsage + 1;
+            }
+        }
+        
+        // Event Listeners
+        scanBtn.addEventListener('click', () => {
+            showNotification("Scanning for nearby Smart Umbrella devices...");
+        });
+        
+        connectBtn.addEventListener('click', () => {
+            const connectedDevice = devices.find(device => device.connected);
+            if (connectedDevice) {
+                connectedDevice.connected = false;
+                connectionStatus.textContent = "Inactive";
+                connectionStatus.style.color = "var(--warning)";
+                showNotification("Disconnected from Smart Umbrella");
+                updateDeviceList();
+            } else {
+                showNotification("Please select a device to connect");
+            }
+        });
+        
+        refreshWeather.addEventListener('click', updateWeather);
+        
+        locateBtn.addEventListener('click', () => {
+            showNotification("Updating your location...");
+            setTimeout(updateLocation, 1000);
+        });
+        
+        shareLocation.addEventListener('click', () => {
+            showNotification("Location shared with your emergency contacts");
+        });
+        
+        // Initialize the application
+        initApp();
+        updateWeather();
+    </script>
+</body>
+</html>
